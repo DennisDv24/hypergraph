@@ -37,15 +37,8 @@ const get721HoldsFromTxs = addr => async txs => {
 	return tokensHeld
 }
 
-const getHoldersOf721 = async contractAddr =>
-	(await axios.get(`\
-		https://api.covalenthq.com/v1/1/tokens/\
-		${contractAddr}\
-		/token_holders/?key=${COVALENT_API}\
-		&page-size=${await getHoldersCountOf(contractAddr)}\
-	`.replace(/\t/g, ''))).data.data
 
-const get721Holds = async (addr) => 
+const getCollectionsHeldByAddress = async (addr) => 
 	get721Txs(addr).then(get721HoldsFromTxs(addr))
 
 const getCollectionStatsByName = async name =>
@@ -60,14 +53,22 @@ const getCollectionName = async contractAddr =>
 	)).data.collection.slug
 
 // FIXME I need a Opensea api key
-const getHoldersCountOf = async contractAddr =>
+const getCollectionHoldersCount = async contractAddr =>
 	getCollectionName(contractAddr).then(getCollectionStatsByName).then(
 		res => res.data.stats.num_owners
 	)
 
+const getHoldersOfCollection = async contractAddr =>
+	(await axios.get(`\
+		https://api.covalenthq.com/v1/1/tokens/\
+		${contractAddr}\
+		/token_holders/?key=${COVALENT_API}\
+		&page-size=${await getCollectionHoldersCount(contractAddr)}\
+	`.replace(/\t/g, ''))).data.data
+
 
 //get721Holds(addr).then(console.log)
-getHoldersOf721(milady_addr).then(console.log)
+getHoldersOfCollection(milady_addr).then(console.log)
 //getCollection(milady_addr).then(console.log)
 
 
