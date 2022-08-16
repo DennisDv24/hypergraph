@@ -4,11 +4,12 @@ require('dotenv').config({ path: './.env' })
 
 const addr = '0x0E124A7c9b378d7276590b6b8b676a75ff923a03'
 const milady_addr = '0x5af0d9827e0c53e4799bb226655a1de152a425a5'
+
 const ETHERSCAN_API = process.env.ETHERSCAN_API
 const COVALENT_API = process.env.COVALENT_API
 
 const getEtherscanProvider = () => 
-	new ethers.providers.EtherscanProvider('mainnet', API)
+	new ethers.providers.EtherscanProvider('mainnet', ETHERSCAN_API)
 
 const get721Txs = async addr => {
 	const currentBlock = await getEtherscanProvider().getBlockNumber()
@@ -41,13 +42,32 @@ const getHoldersOf721 = async contractAddr =>
 		https://api.covalenthq.com/v1/1/tokens/\
 		${contractAddr}\
 		/token_holders/?key=${COVALENT_API}\
+		&page-size=${await getHoldersCountOf(contractAddr)}\
 	`.replace(/\t/g, ''))).data.data
 
 const get721Holds = async (addr) => 
 	get721Txs(addr).then(get721HoldsFromTxs(addr))
 
+const getCollectionStatsByName = async name =>
+	await axios.get(
+		`https://api.opensea.io/api/v1/collection/${name}/stats`
+	)
 
-get721Holds(addr).then(console.log)
+// FIXME I need a Opensea api key
+const getCollectionName = async contractAddr => 
+	(await axios.get(
+		`https://api.opensea.io/api/v1/asset_contract/${contractAddr}`
+	)).data.collection.slug
+
+// FIXME I need a Opensea api key
+const getHoldersCountOf = async contractAddr =>
+	getCollectionName(contractAddr).then(getCollectionStatsByName).then(
+		res => res.data.stats.num_owners
+	)
+
+
+//get721Holds(addr).then(console.log)
 getHoldersOf721(milady_addr).then(console.log)
+//getCollection(milady_addr).then(console.log)
 
 
