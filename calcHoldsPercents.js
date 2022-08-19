@@ -11,6 +11,7 @@ require('dotenv').config({ path: './.env' })
 
 const OPENSEA_API = process.env.OPENSEA_API
 const INFURA_API = process.env.INFURA_API
+const ALCHEMY_API = process.env.ALCHEMY_API
 
 const holds = JSON.parse(fs.readFileSync('holds/derivHolds.json'));
 
@@ -32,17 +33,24 @@ const totalSupply = async contract =>
 
 const milady_addr = '0x5af0d9827e0c53e4799bb226655a1de152a425a5'
 
+const getContractMetadataFromAlchemy = async contractAddr =>
+	(await axios.get(`\
+		https://eth-mainnet.g.alchemy.com/nft/v2/\
+		${ALCHEMY_API}/getContractMetadata\
+		?contractAddress=${contractAddr}\
+	`.formatTabs())).data
+
 const logMeta = async key => {
 	try {
-		const { 
-			slug, name 
-		} = (await getCollectionOpenseaMetadata(key)).collection
-		const { total_supply } = await getCollectionStatsBySlug(slug)
+		const { name, totalSupply } = (
+			await getContractMetadataFromAlchemy(key)
+		).contractMetadata
+		console.log(name, totalSupply)
 		console.log([
 			`Name: ${name}`,
 			`Address: ${key}`,
 			`MiladyHolds: ${holds[key]}`,
-			`TotalSupply: ${total_supply}`
+			`TotalSupply: ${totalSupply}`
 		])
 	} catch (e) {
 		console.log('Non standarized contact, ignoring...')
