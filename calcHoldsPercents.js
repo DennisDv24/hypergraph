@@ -40,33 +40,52 @@ const getContractMetadataFromAlchemy = async contractAddr =>
 		?contractAddress=${contractAddr}\
 	`.formatTabs())).data
 
-const logMeta = async key => {
+const correctFormatMetaAux = data =>
+	data !== undefined && data !== null && data !== ''
+
+const correclyFormatedMetadata = (...args) => 
+	args.reduce((fst, snd) => 
+		correctFormatMetaAux(fst) && correctFormatMetaAux(snd)
+	)
+
+const getData = async key => {
 	try {
 		const { name, totalSupply } = (
 			await getContractMetadataFromAlchemy(key)
 		).contractMetadata
-		console.log(name, totalSupply)
-		console.log([
-			`Name: ${name}`,
-			`Address: ${key}`,
-			`MiladyHolds: ${holds[key]}`,
-			`TotalSupply: ${totalSupply}`
-		])
+		const matchPercent = holds[key] / totalSupply
+		if(!correclyFormatedMetadata(totalSupply, name) || matchPercent > 1){
+			console.log('Non standarized collection')
+			return
+		}
+		return {
+			contractAddress: key,
+			matchPercent: matchPercent
+		}
 	} catch (e) {
-		console.log('Non standarized contact, ignoring...')
+		console.log(e)
 	}
 
 }
 
 // FIXME you should get all this data from the first script
 const main = async () => {
+	const finalData = []
 	let i = 0
 	let len = Object.keys(holds).length
 	for (const key of Object.keys(holds)) {
-		console.log(`${(i/len) * 100}%`)
-		await logMeta(key)
+		console.log(`Script progress: ${(i/len) * 100}%`)
+		const data = await getData(key)
+		if(data) finalData.push(data)
 		i++
 	}
+	fs.writeFile(
+		'finalData/sortedByMatch.json',
+		JSON.stringify(finalData.sort(
+			(a, b) => a.matchPercent > b.matchPercent ? -1 : 1
+		)),
+		err => {if(err) throw err}
+	)
 }
 
 main()
