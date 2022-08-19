@@ -3,8 +3,8 @@ const express = require('express')
 const router = express.Router()
 
 
-router.get('/:minRelation?', (req, res) => {
-	const min = parseFloat(req.params.minRelation)
+router.get('/', (req, res) => {
+	const min = parseFloat(req.query.minRelation)
 	data = JSON.parse(fs.readFileSync(
 		'data/finalData/sortedByMatch.json'
 	))

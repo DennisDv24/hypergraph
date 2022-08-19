@@ -10,7 +10,10 @@ PORT = process.env.PORT || 5000
 
 app.use(express.json())
 app.use(cors())
-app.use('/related-collections', require('./routes/relatedCollections.routes.js'))
+app.use(
+	'/api/related-collections',
+	require('./routes/relatedCollections.routes.js')
+)
 
 
 app.listen(PORT, () => console.log(`Server on port ${PORT}`))
