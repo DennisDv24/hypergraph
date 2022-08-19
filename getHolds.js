@@ -60,21 +60,24 @@ const get721HoldsFromTxs = addr => async txs => {
 const getCollectionsHeldByAddress = async (addr) => 
 	get721Txs(addr).then(get721HoldsFromTxs(addr))
 
-const getCollectionStatsByName = async name =>
-	await axios.get(
+const getCollectionStatsBySlug = async name =>
+	(await axios.get(
 		`https://api.opensea.io/api/v1/collection/${name}/stats`
-	)
+	)).data.stats
 
-// FIXME I need a Opensea api key
-const getCollectionName = async contractAddr => 
+
+const getCollectionOpenseaMetadata = async contractAddr =>
 	(await axios.get(
 		`https://api.opensea.io/api/v1/asset_contract/${contractAddr}`,
 		{ headers: { 'x-api-key': OPENSEA_API } }
-	)).data.collection.slug
+	)).data
+
+const getCollectionSlug = async contractAddr => 
+	(await getCollectionOpenseaMetadata(contractAddr)).collection.slug
 
 const getCollectionHoldersCount = async contractAddr =>
-	getCollectionName(contractAddr).then(getCollectionStatsByName).then(
-		res => res.data.stats.num_owners
+	getCollectionSlug(contractAddr).then(getCollectionStatsBySlug).then(
+		res => res.num_owners
 	)
 
 const getHoldersOfCollection = async (contractAddr, amount = null) =>
@@ -129,5 +132,8 @@ const main = async () => {
 	)
 }
 
-main()
-
+module.exports = {
+	getCollectionOpenseaMetadata,
+	getCollectionSlug,
+	getCollectionStatsBySlug
+}

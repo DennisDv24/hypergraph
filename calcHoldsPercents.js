@@ -1,9 +1,15 @@
 const fs = require('fs')
 const ethers = require('ethers')
+const axios = require('axios')
+const { 
+	getCollectionOpenseaMetadata,
+	getCollectionStatsBySlug
+} = require('./getHolds.js')
+
 require('dotenv').config({ path: './.env' })
 
 
-
+const OPENSEA_API = process.env.OPENSEA_API
 const INFURA_API = process.env.INFURA_API
 
 const holds = JSON.parse(fs.readFileSync('holds/derivHolds.json'));
@@ -28,12 +34,15 @@ const milady_addr = '0x5af0d9827e0c53e4799bb226655a1de152a425a5'
 
 const logMeta = async key => {
 	try {
-		const colle = get721Meta(key)
+		const { 
+			slug, name 
+		} = (await getCollectionOpenseaMetadata(key)).collection
+		const { total_supply } = await getCollectionStatsBySlug(slug)
 		console.log([
-			`Name: ${await colle.name()}`,
+			`Name: ${name}`,
 			`Address: ${key}`,
 			`MiladyHolds: ${holds[key]}`,
-			`TotalSupply: ${await totalSupply(colle)}`
+			`TotalSupply: ${total_supply}`
 		])
 	} catch (e) {
 		console.log('Non standarized contact, ignoring...')
