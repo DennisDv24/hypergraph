@@ -11,7 +11,13 @@ const API = process.env.ETHERSCAN_API
 // Computed as a module constant for efficiency reasons
 // const LAST_BLOCK = await _getLastBlockNumber()
 
-const get721Txs = async (addr: string): Promise<string[]> =>
+type TxDataResponse = {
+	contractAddress: string,
+	to: string,
+	from: string,
+}
+
+export const _getERC721TransactionsOf = async (addr: string): Promise<TxDataResponse[]> =>
 	(await axios.get(`\
 		https://api.etherscan.io/api\
 		?module=account\
@@ -20,19 +26,15 @@ const get721Txs = async (addr: string): Promise<string[]> =>
 		&startblock=${13090000}\
 		&endblock=${await _getLastBlockNumber()}\
 		&apikey=${API}\
-	`.formatTabs()))
+	`.formatTabs())).data.result
 
-
+/*
 const main = async () => {
-	const txs = await get721Txs(
+	const txs = await _getERC721TransactionsOf(
 		'0x0E124A7c9b378d7276590b6b8b676a75ff923a03'
 	)
-	console.log(txs)
-	console.log(`\
-		hola que tal\
-		andamos\
-	`.formatTabs())
-
+	console.log(txs.map(tx => tx as TxDataResponse))
 }
 
 main()
+*/
