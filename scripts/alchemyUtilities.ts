@@ -1,9 +1,10 @@
 require('dotenv').config({ path: './.env' })
 
-const ALCHEMY_API = process.env.ALCHEMY_API
+const API = process.env.ALCHEMY_API
 
-const alchemySdk = require('api')('@alchemy-docs/v1.0#u2rm9ol7vhuzf7')
-alchemySdk.server('https://eth-mainnet.g.alchemy.com/nft/v2');
+const nftSdk = require('api')('@alchemy-docs/v1.0#u2rm9ol7vhuzf7')
+nftSdk.server('https://eth-mainnet.g.alchemy.com/nft/v2');
+const chainSdk = require('api')('@alchemy-docs/v1.0#e8ds3ul6b4ahe2')
 
 export type Holders = string[]
 export type HoldersAndBals = [{
@@ -15,19 +16,31 @@ export type HoldersAndBals = [{
 export const _getCollectionHolders = async (
 	cAddr: string, showBals?: boolean
 ): Promise<Holders | HoldersAndBals> => (
-	(await alchemySdk.getOwnersForCollection({
+	(await nftSdk.getOwnersForCollection({
 		contractAddress: cAddr,
 		withTokenBalances: showBals,
-		apikey: ALCHEMY_API
+		apikey: API
 	})).ownerAddresses
 )
 
+type LastBlockResponse = {
+	jsonrpc: string,
+	id: number,
+	result: string
+}
+
+export const _getLastBlockNumber = async (): Promise<number> =>
+	chainSdk.ethBlocknumber({
+		id: 1,
+  		jsonrpc: '2.0',
+  		method: 'eth_blockNumber',
+		apikey: API
+	}).then((res: LastBlockResponse) => Number(res.result))
+
 /*
 const main = async () => {
-	const holds = await _getCollectionHolders(
-		'0x1352149Cd78D686043B504e7e7D96C5946b0C39c', true
-	)
-	console.log(holds[0])
+	const lastB = await _getLastBlockNumber()
+	console.log(lastB)
 }
 
 main()
