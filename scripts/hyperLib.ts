@@ -52,7 +52,7 @@ export const getAllERC721HoldingsOf = async (addr: string): Promise<string[]> =>
 	Object.keys(await getAllERC721HoldingsAndBalsOf(addr))
 	
 
-
+/*
 const main = async () => {
 	const addr = '0x0E124A7c9b378d7276590b6b8b676a75ff923a03'
 	const holds = await getAllERC721HoldingsOf(addr)
@@ -60,4 +60,5 @@ const main = async () => {
 }
 
 main()
+*/
 
