@@ -18,7 +18,9 @@ const _clearNullBals = (bals: AddressBals): AddressBals => {
 
 
 export const getCollectionHolders = async (contractAddr: string): Promise<Holders> =>
-	await _getCollectionHolders(contractAddr) as Holders
+	(_getCollectionHolders(contractAddr)).then(
+		res => res as Holders
+	).catch(err => [])
 
 type FormatedHolds = {[addr: string]: number}
 export const getHoldersBalancesFor = async (cAddr: string): Promise<FormatedHolds> => {
@@ -51,14 +53,13 @@ export const getAllERC721HoldingsAndBalsOf = async (addr: string): Promise<Forma
 export const getAllERC721HoldingsOf = async (addr: string): Promise<string[]> =>
 	Object.keys(await getAllERC721HoldingsAndBalsOf(addr))
 	
-
 /*
 const main = async () => {
-	const addr = '0x0E124A7c9b378d7276590b6b8b676a75ff923a03'
-	const holds = await getAllERC721HoldingsOf(addr)
+	const addr = '0x1352149cd78d686043b504e7e7d96c5946b0c39c'
+	const holds = await getCollectionHolders(addr)
 	console.log(holds)
+	console.log(holds.length)
 }
 
 main()
 */
-

@@ -29,7 +29,7 @@ const saveRelatedCollections = async (collections: Set<string>) => {
 
 const main = async () => {
 	const rels = await getRelatedCollections(
-		'0x0c3b4acd61df1e193d5c53f6cd4bd27c48ff336b'
+		'0x5af0d9827e0c53e4799bb226655a1de152a425a5'
 	)
 	saveRelatedCollections(rels)
 	console.log(rels)
