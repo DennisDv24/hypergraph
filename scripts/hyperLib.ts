@@ -20,7 +20,11 @@ const _clearNullBals = (bals: AddressBals): AddressBals => {
 export const getCollectionHolders = async (contractAddr: string): Promise<Holders> =>
 	(_getCollectionHolders(contractAddr)).then(
 		res => res as Holders
-	).catch(err => [])
+	).catch(err => {
+		console.log("ERROR: Something went wrong while fetching collection holders")
+		console.log(`Addr: ${contractAddr}`)
+		return []
+	})
 
 type FormatedHolds = {[addr: string]: number}
 export const getHoldersBalancesFor = async (cAddr: string): Promise<FormatedHolds> => {
