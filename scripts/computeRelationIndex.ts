@@ -62,7 +62,7 @@ const main = async () => {
 		BASE_COLLECTION, RELATED_COLLECTIONS
 	)
 
-	relations.sort((a, b) => a.matchPercent > b.matchPercent ? 1 : -1)
+	relations.sort((a, b) => a.matchPercent > b.matchPercent ? -1 : 1)
 	saveRelatedCollectionsAndIndices(relations)
 }
 
