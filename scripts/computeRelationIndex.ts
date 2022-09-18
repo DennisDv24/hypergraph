@@ -58,11 +58,13 @@ const main = async () => {
 	const BASE_COLLECTION = '0x5af0d9827e0c53e4799bb226655a1de152a425a5'
 	const RELATED_COLLECTIONS = JSON.parse(fs.readFileSync('../data/derivHolds.json'))
 
-	const relations = await computeRelationIndexesOfCollections(
+	let relations = await computeRelationIndexesOfCollections(
 		BASE_COLLECTION, RELATED_COLLECTIONS
 	)
 
+	relations = relations.filter(x => x.matchPercent != 0)
 	relations.sort((a, b) => a.matchPercent > b.matchPercent ? -1 : 1)
+
 	saveRelatedCollectionsAndIndices(relations)
 }
 
